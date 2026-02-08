@@ -34,6 +34,7 @@ Always output:
 1. A short preflight status summary.
 2. If needed, the push command to set upstream for current branch.
 3. A ready-to-run `gh pr create` command for the user.
+4. A post-merge sync reminder for the agent clones.
 
 ## Command templates
 
@@ -52,6 +53,15 @@ gh pr create \
   --head "eivindeb-bot:$(git branch --show-current)" \
   --title "<type>: <short summary>" \
   --body "<summary of change and validation>"
+```
+
+After merge, always include this sync sequence:
+
+```bash
+git checkout main
+git fetch upstream
+git rebase upstream/main
+git push origin main
 ```
 
 ## PR text quality bar
