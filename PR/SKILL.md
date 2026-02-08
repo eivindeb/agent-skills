@@ -12,8 +12,9 @@ This skill does not stage, commit, push, or run `gh` directly. It validates bran
 ## Inputs expected
 
 - Work is already committed on a feature branch.
-- Branch is pushed (or nearly pushed) to bot fork.
-- `origin` should be bot fork and `upstream` should be canonical repo.
+- Branch is pushed (or nearly pushed) to the agent-writable fork.
+- `origin` is the fork remote.
+- `upstream` is the canonical/original remote.
 
 ## Guardrails
 
@@ -21,9 +22,10 @@ Before producing the PR command, verify:
 
 1. Current branch is not `main`.
 2. Branch name follows feature flow (prefer `feature/*`, allow `fix/*`, `refactor/*`, `enhance/*`, `experiment/*`).
-3. `origin` points to `git@github.com-bot:eivindeb-bot/home-server.git`.
-4. `upstream` points to `git@github.com-personal:eivindeb/home-server.git`.
-5. Working tree is clean.
+3. `origin` and `upstream` both exist.
+4. `origin` and `upstream` point to different owners but the same repository name.
+5. Current branch tracks `origin/<branch>` (or provide push command).
+6. Working tree is clean.
 
 If any check fails, stop and output exact corrective commands first.
 
@@ -48,9 +50,9 @@ Always provide PR creation command:
 
 ```bash
 gh pr create \
-  --repo eivindeb/home-server \
+  --repo "<upstream_owner>/<repo_name>" \
   --base main \
-  --head "eivindeb-bot:$(git branch --show-current)" \
+  --head "<origin_owner>:$(git branch --show-current)" \
   --title "<type>: <short summary>" \
   --body "<summary of change and validation>"
 ```
