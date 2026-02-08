@@ -1,82 +1,69 @@
 ---
 name: "pr"
-description: "Use when asked to stage, commit, push, and open a GitHub pull request from an agent clone to the canonical repo."
+description: "Use when asked to prepare pull request creation for a feature branch by validating guardrails and outputting a ready-to-run gh pr create command for the user."
 ---
 
 ## Purpose
 
-Create PRs safely from agent clones using GitHub CLI (`gh`) and fork-based remotes.
+PR-only endpoint for feature branches.
 
-## Prerequisites
+This skill does not stage, commit, push, or run `gh` directly. It validates branch/remotes state and outputs the exact `gh pr create` command the user should run.
 
-- Require GitHub CLI `gh`. Check `gh --version`. If missing, ask user to install and stop.
-- Require authenticated `gh` session. Run `gh auth status -h github.com`.
-- Require agent clone remote layout:
-  - `origin` -> bot fork (`git@github.com-bot:eivindeb-bot/home-server.git`)
-  - `upstream` -> canonical repo (`git@github.com-personal:eivindeb/home-server.git`)
+## Inputs expected
 
-## Naming conventions
+- Work is already committed on a feature branch.
+- Branch is pushed (or nearly pushed) to bot fork.
+- `origin` should be bot fork and `upstream` should be canonical repo.
 
-- Branch: `feature/{description}` when starting from `main`.
-- Commit: Conventional Commit style, terse: `<type>: {description}` (examples: `fix: smb validation path`, `docs: add agent clone workflow`).
-- PR title: keep concise and aligned with the commit message.
+## Guardrails
 
-## Workflow
+Before producing the PR command, verify:
 
-1. Validate environment and remotes.
+1. Current branch is not `main`.
+2. Branch name follows feature flow (prefer `feature/*`, allow `fix/*`, `refactor/*`, `enhance/*`, `experiment/*`).
+3. `origin` points to `git@github.com-bot:eivindeb-bot/home-server.git`.
+4. `upstream` points to `git@github.com-personal:eivindeb/home-server.git`.
+5. Working tree is clean.
 
-```bash
-gh --version
-gh auth status -h github.com
-git remote -v
-git branch --show-current
-```
+If any check fails, stop and output exact corrective commands first.
 
-2. If currently on `main`, create a feature branch.
+## Output contract
 
-```bash
-git checkout -b "feature/{description}"
-```
+Always output:
 
-3. Confirm status, then stage and commit.
+1. A short preflight status summary.
+2. If needed, the push command to set upstream for current branch.
+3. A ready-to-run `gh pr create` command for the user.
 
-```bash
-git status -sb
-git add -A
-git commit -m "<type>: {description}"
-```
+## Command templates
 
-4. Push with tracking.
+If branch is not yet tracking/pushed, include:
 
 ```bash
 git push -u origin "$(git branch --show-current)"
 ```
 
-5. Create PR to canonical repo `main`.
+Always provide PR creation command:
 
 ```bash
-GH_PROMPT_DISABLED=1 GIT_TERMINAL_PROMPT=0 gh pr create \
+gh pr create \
   --repo eivindeb/home-server \
   --base main \
   --head "eivindeb-bot:$(git branch --show-current)" \
-  --fill
+  --title "<type>: <short summary>" \
+  --body "<summary of change and validation>"
 ```
 
-## PR body quality bar
+## PR text quality bar
 
-- Explain the problem/context.
-- Summarize what changed and why.
-- Note validation/tests run (or state if not run).
-- Keep it factual and concise.
+- Title matches change intent and commit style.
+- Body states:
+  - Context/problem
+  - What changed
+  - Validation performed (or explicitly not run)
 
-## Safety checks
+## Relationship to other skills
 
-- Never push directly to `upstream`.
-- Never merge directly to `main` from agent session.
-- If push is rejected as non-fast-forward, set upstream and rebase:
-
-```bash
-git branch --set-upstream-to=origin/"$(git branch --show-current)"
-git pull --rebase
-git push
-```
+- `feature-start`: branch setup policy.
+- `fcommit`: progress commits during implementation.
+- `PR`: final handoff command for user-run PR creation.

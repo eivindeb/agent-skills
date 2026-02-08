@@ -66,5 +66,5 @@ Should I create this branch? (or suggest a different name)
 
 - Check current branch first (don't suggest if already on a feature branch)
 - Use judgment - when in doubt, suggest the branch (easy to decline)
-- After creating branch, remind about `/fcommit` and `/ffinish` workflow
+- After creating branch, remind about `/fcommit` during development and `/PR` to open the pull request. Use `/PR` only after the branch is pushed and the working tree is clean
 - Don't suggest feature branches for work already in progress

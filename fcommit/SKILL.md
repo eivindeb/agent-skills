@@ -82,4 +82,4 @@ Now you can work on the next step without holding all those details in context.
 
 - Use after `/feature-start` creates branch
 - Call frequently during development (5-10+ times per feature)
-- Finish with `/ffinish` to squash all commits
+- Finish by using `/PR` to push and open a pull request
