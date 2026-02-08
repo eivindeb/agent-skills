@@ -24,29 +24,32 @@ Before producing the PR command, verify:
 2. Branch name follows feature flow (prefer `feature/*`, allow `fix/*`, `refactor/*`, `enhance/*`, `experiment/*`).
 3. `origin` and `upstream` both exist.
 4. `origin` and `upstream` point to different owners but the same repository name.
-5. Current branch tracks `origin/<branch>` (or provide push command).
+5. Current branch tracks `origin/<branch>`.
 6. Working tree is clean.
+7. Branch contains commits not on `main`.
 
-If any check fails, stop and output exact corrective commands first.
+If any check fails:
+- Stop immediately.
+- Do not output a `gh pr create` command.
+- Report which checks failed.
+- Suggest corrective actions for the user to perform.
 
 ## Output contract
 
-Always output:
+When all preflight checks pass, output:
 
 1. A short preflight status summary.
-2. If needed, the push command to set upstream for current branch.
-3. A ready-to-run `gh pr create` command for the user.
-4. A post-merge sync reminder for the agent clones.
+2. A ready-to-run `gh pr create` command for the user.
+
+When preflight checks fail, output:
+
+1. A short preflight status summary.
+2. Which checks failed.
+3. Suggested corrective actions (do not proceed to PR command).
 
 ## Command templates
 
-If branch is not yet tracking/pushed, include:
-
-```bash
-git push -u origin "$(git branch --show-current)"
-```
-
-Always provide PR creation command:
+PR creation command:
 
 ```bash
 gh pr create \
@@ -57,14 +60,11 @@ gh pr create \
   --body "<summary of change and validation>"
 ```
 
-After merge, always include this sync sequence:
+## Post-merge behavior
 
-```bash
-git checkout main
-git fetch upstream
-git rebase upstream/main
-git push origin main
-```
+Do not output post-merge sync commands during PR preparation.
+
+After the user explicitly states the PR has been merged, the agent should execute the post-merge sync steps itself.
 
 ## PR text quality bar
 
