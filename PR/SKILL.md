@@ -49,6 +49,8 @@ When preflight checks fail, output:
 
 ## Command templates
 
+Use inline `--body` output by default.
+
 PR creation command:
 
 ```bash
@@ -59,6 +61,16 @@ gh pr create \
   --title "<type>: <short summary>" \
   --body "<summary of change and validation>"
 ```
+
+### Shell-safety directive for generated `--body`
+
+When generating inline `--body` text, avoid characters that commonly break pasted shell commands.
+
+- Do not use markdown backticks.
+- Do not use double quotes.
+- Do not use command-substitution markers like `$(` or backticks.
+- Prefer plain text headings and hyphen bullets.
+- If code identifiers are needed, write them as plain words without quoting.
 
 ## Post-merge behavior
 
