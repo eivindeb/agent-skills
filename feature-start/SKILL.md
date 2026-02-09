@@ -33,16 +33,26 @@ Use descriptive, kebab-case names:
 Format: `<type>/<brief-description>`
 - Types: `feature`, `fix`, `refactor`, `enhance`, `experiment`
 
+## Explicit Trigger Override
+
+If the user explicitly says to use `$feature-start` (or clearly invokes this skill by name), do not evaluate whether the task qualifies for a feature branch.
+
+In that case, immediately:
+- Propose a branch name for the requested task
+- Provide concise first steps to begin the work
+- Skip the usual "should we use this skill" assessment
+
 ## Workflow
 
-1. **Assess the task** - Determine if it meets feature branch criteria
-2. **If YES**:
+1. **Check for explicit trigger** - If user explicitly requested `$feature-start`, apply the explicit trigger override
+2. **Otherwise assess the task** - Determine if it meets feature branch criteria
+3. **If YES**:
    - Suggest a branch name based on the task
    - Explain why a feature branch is recommended
    - Ask user to approve/decline or provide alternative name
    - If approved: Create the branch and switch to it
    - Remind user to use `/fcommit` for progress tracking
-3. **If NO**:
+4. **If NO**:
    - Briefly note that this is a small task suitable for direct commits to current branch
    - Proceed with the work
 
@@ -64,6 +74,7 @@ Should I create this branch? (or suggest a different name)
 
 ## Important Notes
 
+- If user explicitly invokes `$feature-start`, skip qualification and go straight to branch suggestion + first steps
 - Check current branch first (don't suggest if already on a feature branch)
 - Use judgment - when in doubt, suggest the branch (easy to decline)
 - After creating branch, remind about `/fcommit` during development and `/PR` to open the pull request. Use `/PR` only after the branch is pushed and the working tree is clean
