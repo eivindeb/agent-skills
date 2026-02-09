@@ -42,6 +42,16 @@ Do immediately:
 - Give first 2-4 kickoff steps
 - Do not ask whether to use this skill
 
+## Required Skill Chaining
+
+When `feature-start` is used and work is on a feature branch, the agent must also load and apply the `$fcommit` skill.
+
+Requirements:
+- Treat `$fcommit` as active companion guidance for the entire feature-branch session
+- Start using `$fcommit` immediately after branch creation (or immediately if already on a feature branch)
+- Continue using `$fcommit` throughout development, not as a one-time reminder
+- Make frequent progress commits following `$fcommit` cadence and message format
+
 ## Workflow
 
 1. **Check explicit trigger** - If `$feature-start` was explicitly requested, apply override and continue
@@ -51,7 +61,8 @@ Do immediately:
    - State brief reason for feature branch
    - Ask for approve/rename
    - If approved: create and switch branch
-   - Remind about `/fcommit`
+   - Load and apply `$fcommit` skill for ongoing development on this branch
+   - Commit frequently using `$fcommit` guidance (not just a reminder)
 4. **If NO**:
    - Say direct commit is sufficient
    - Proceed
@@ -77,5 +88,6 @@ Should I create this branch? (or suggest a different name)
 - Explicit `$feature-start` invocation always bypasses qualification
 - Check current branch first (don't suggest if already on a feature branch)
 - Use judgment - when in doubt, suggest the branch (easy to decline)
-- After creating branch, remind about `/fcommit` during development and `/PR` to open the pull request. Use `/PR` only after the branch is pushed and the working tree is clean
+- After creating or confirming a feature branch, explicitly load `$fcommit` and keep using it during development
+- Use `/PR` only after the branch is pushed and the working tree is clean
 - Don't suggest feature branches for work already in progress
