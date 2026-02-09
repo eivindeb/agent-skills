@@ -35,26 +35,26 @@ Format: `<type>/<brief-description>`
 
 ## Explicit Trigger Override
 
-If the user explicitly says to use `$feature-start` (or clearly invokes this skill by name), do not evaluate whether the task qualifies for a feature branch.
+If user explicitly invokes `$feature-start`, skip qualification.
 
-In that case, immediately:
-- Propose a branch name for the requested task
-- Provide concise first steps to begin the work
-- Skip the usual "should we use this skill" assessment
+Do immediately:
+- Suggest branch name
+- Give first 2-4 kickoff steps
+- Do not ask whether to use this skill
 
 ## Workflow
 
-1. **Check for explicit trigger** - If user explicitly requested `$feature-start`, apply the explicit trigger override
-2. **Otherwise assess the task** - Determine if it meets feature branch criteria
+1. **Check explicit trigger** - If `$feature-start` was explicitly requested, apply override and continue
+2. **Otherwise assess task** - Check feature-branch criteria
 3. **If YES**:
-   - Suggest a branch name based on the task
-   - Explain why a feature branch is recommended
-   - Ask user to approve/decline or provide alternative name
-   - If approved: Create the branch and switch to it
-   - Remind user to use `/fcommit` for progress tracking
+   - Suggest branch name
+   - State brief reason for feature branch
+   - Ask for approve/rename
+   - If approved: create and switch branch
+   - Remind about `/fcommit`
 4. **If NO**:
-   - Briefly note that this is a small task suitable for direct commits to current branch
-   - Proceed with the work
+   - Say direct commit is sufficient
+   - Proceed
 
 ## Example Interaction
 
@@ -74,7 +74,7 @@ Should I create this branch? (or suggest a different name)
 
 ## Important Notes
 
-- If user explicitly invokes `$feature-start`, skip qualification and go straight to branch suggestion + first steps
+- Explicit `$feature-start` invocation always bypasses qualification
 - Check current branch first (don't suggest if already on a feature branch)
 - Use judgment - when in doubt, suggest the branch (easy to decline)
 - After creating branch, remind about `/fcommit` during development and `/PR` to open the pull request. Use `/PR` only after the branch is pushed and the working tree is clean
