@@ -7,7 +7,7 @@ description: "Use when asked to prepare pull request creation for a feature bran
 
 PR-only endpoint for feature branches.
 
-This skill does not stage, commit, push, or run `gh` directly. It validates branch/remotes state and outputs the exact `gh pr create` command the user should run.
+This skill does not stage, commit, push, or run `gh` directly. It validates branch/remotes state, runs full-project tests as a preflight, and outputs the exact `gh pr create` command the user should run.
 
 ## Inputs expected
 
@@ -33,6 +33,34 @@ If any check fails:
 - Do not output a `gh pr create` command.
 - Report which checks failed.
 - Suggest corrective actions for the user to perform.
+
+## Test Preflight
+
+Run a full-project test suite as part of PR preflight.
+
+Requirements:
+
+1. Always identify and run the canonical "run all tests" command for the current project before producing a PR command.
+2. Cache successful test runs so they are not rerun unnecessarily.
+3. Cache key must include at least:
+- `HEAD` commit SHA
+- Test command string
+4. Reuse cached success when key matches and no tracked files changed since the cached run.
+5. Invalidate cache when:
+- `HEAD` changes
+- test command changes
+- tracked working tree content changes
+6. Failed test runs must never be cached as pass.
+
+Recommended cache implementation:
+
+- Store cache in `.git` metadata (for example, `.git/pr_preflight_test_cache.json`) so it remains local to the repository.
+- Record timestamp, commit SHA, command, and result.
+
+If tests fail:
+- Stop immediately.
+- Do not output a `gh pr create` command.
+- Report failing command and key failure summary.
 
 ## Output contract
 
