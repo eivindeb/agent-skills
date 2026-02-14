@@ -1,0 +1,4 @@
+interface:
+  display_name: "Uninterrupted Execution"
+  short_description: "Execute TASK.md milestones until closure or escalation"
+  default_prompt: "Execute from an existing .agent/tasks/.../TASK.md: run milestone-by-milestone with heartbeats, verify at each gate, classify errors, escalate on repeated fingerprints, and close only with evidence-backed passing checks."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Uninterrupted Execution Planner"
+  short_description: "Build a persistent TASK.md contract before implementation"
+  default_prompt: "Create or normalize .agent/tasks/.../TASK.md with acceptance criteria, milestones, verification, evidence mapping, and escalation policy."
