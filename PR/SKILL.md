@@ -7,7 +7,7 @@ description: "Use when asked to prepare pull request creation for a feature bran
 
 PR-only endpoint for feature branches.
 
-This skill does not stage, commit, push, or run `gh` directly. It validates branch/remotes state, runs full-project tests as a preflight, and outputs the exact `gh pr create` command the user should run.
+This skill does not stage, commit, push, or run `gh` directly. It validates branch/remotes state, prepares the feature branch against upstream main, runs full-project tests as part of preflight, and outputs the exact `gh pr create` command the user should run.
 
 ## Inputs expected
 
@@ -34,13 +34,39 @@ If any check fails:
 - Report which checks failed.
 - Suggest corrective actions for the user to perform.
 
-## Test Preflight
+## PR Prerequisites
 
-Run a full-project test suite as part of PR preflight.
+Complete these prerequisite steps before running preflight checks:
+
+1. Fetch latest upstream main.
+2. Merge upstream main into the current feature branch.
+3. If merge conflicts occur:
+- Stop before resolving.
+- Inspect each conflicted file and summarize what each side changed.
+- Provide a suggested resolution for each conflict.
+- Get explicit user agreement for each suggested resolution.
+- Apply the agreed resolutions, then continue.
+
+If upstream sync or conflict resolution is incomplete:
+- Stop immediately.
+- Do not output a `gh pr create` command.
+- Report what is blocking prerequisite completion.
+
+## Preflight Checks
+
+Run PR preflight checks only after prerequisites are complete.
+
+Preflight checks are intended to be rerunnable.
+
+1. Run the full-project test suite (see Test section below).
+
+## Test (Part of Preflight)
+
+Run a full-project test suite as the final preflight step.
 
 Requirements:
 
-1. Always identify and run the canonical "run all tests" command for the current project before producing a PR command.
+1. Always identify and run the canonical run all tests command for the current project before producing a PR command.
 2. Cache successful test runs so they are not rerun unnecessarily.
 3. Cache key must include at least:
 - `HEAD` commit SHA
@@ -61,6 +87,17 @@ If tests fail:
 - Stop immediately.
 - Do not output a `gh pr create` command.
 - Report failing command and key failure summary.
+
+## PR Body Context Requirements
+
+When preparing the PR title/body, do not summarize only recent commits.
+
+Requirements:
+
+1. Read full commit history for the feature branch since divergence from main (for example `git log --oneline main..HEAD`).
+2. Reflect the entire branch scope in the PR body, including all meaningful changes.
+3. Include intent/motivation for the feature branch, not just implementation details.
+4. Look for a task document on the branch (for example `.agent/tasks/.../TASK.md`) and incorporate relevant background/context.
 
 ## Output contract
 
@@ -87,7 +124,7 @@ gh pr create \
   --base main \
   --head "<origin_owner>:$(git branch --show-current)" \
   --title "<type>: <short summary>" \
-  --body "<summary of change and validation>"
+  --body "<summary of full branch context, motivation, and validation>"
 ```
 
 ### Shell-safety directive for generated `--body`
@@ -102,16 +139,21 @@ When generating inline `--body` text, avoid characters that commonly break paste
 
 ## Post-merge behavior
 
-Do not output post-merge sync commands during PR preparation.
+After the user explicitly states the PR has been merged, include and run these sync commands:
 
-After the user explicitly states the PR has been merged, the agent should execute the post-merge sync steps itself.
+```bash
+git checkout main
+git fetch upstream
+git rebase upstream/main
+git push origin main
+```
 
 ## PR text quality bar
 
 - Title matches change intent and commit style.
 - Body states:
-  - Context/problem
-  - What changed
+  - Context/problem and motivation
+  - What changed across the full branch
   - Validation performed (or explicitly not run)
 
 ## Relationship to other skills
