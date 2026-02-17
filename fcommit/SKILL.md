@@ -25,44 +25,50 @@ Use commits as context anchors during feature development:
 
 **Structure**: `<what changed>: <why it matters>`
 
+The why-clause must distinguish concrete impact. If it's generic enough to apply to any commit ("improve observability", "improve reproducibility"), rewrite it with the specific outcome or risk avoided.
+
 **Good examples:**
 - `Add user login form: enable authentication flow`
 - `Extract validation logic: prepare reuse in signup`
 - `Fix password hashing: align with auth requirements`
+- `Track readiness timing: surface gaps that caused false-negative health checks`
 
 **Bad examples:**
 - `Change bcrypt.hash() to use 12 rounds` (too implementation-specific)
 - `Update UserSchema class` (too low-level)
 - `Refactor code` (too vague)
+- `Track readiness timing: improve deployment observability` (generic why — what observability gap?)
 
 ### Commit Body (for high-scope commits)
 
-Add a 3-6 line body when the commit has high scope: many files, new modules, cross-layer changes, migrations, or notable design decisions.
+**First: split before adding a body.** If a commit is large but separable into coherent atomic commits, split it. Use a body only when splitting would hurt coherence — e.g., a new module where the parts don't make sense independently.
 
-The body captures **boundaries and constraints**, not code-level detail:
-- What was introduced or removed at a component level
-- Key design decisions or tradeoffs made
-- Scope boundaries (what this deliberately does *not* touch)
+The body captures **boundaries and constraints**, not code-level detail. Use whichever of these apply:
+- **Introduces**: what was added at a component/module level
+- **Decision**: key design choices or tradeoffs made
+- **Out of scope**: what this deliberately does *not* touch
 
-**When to add a body:**
-- Commit touches ~5+ files or introduces a new module/subsystem
+**When to add a body** — the primary trigger is conceptual surface area, not file count:
+- A new subsystem, workflow, or API contract is introduced
 - There are non-obvious constraints or tradeoffs worth recording
-- The subject alone would require `git show` to understand the scope
+- The subject alone wouldn't let someone understand the scope without reading code
+
+File count is a secondary hint (~5+ files suggests high scope), but a 2-file commit introducing a new contract warrants a body, while a 10-file mechanical rename may not.
 
 **When subject-only is fine:**
-- Small, focused commits (1-4 files, single concern)
+- Small, focused commits (single concern)
 - The subject fully communicates intent and scope
+- Mechanically repetitive changes (renames, formatting, version bumps)
 - This is the common case (~80% of commits)
 
 **Body example:**
 ```
 Add eval input transformations: unblock stage-based runs
 
-- New transformation pipeline with routing, service, and pipeline modules
-- Each stage adapter declares required input keys via protocol
-- Transforms are composable and applied per-example before scoring
-- Tests cover pipeline composition and routing dispatch
-- Does not change existing harness scoring path
+- Introduces: transformation pipeline with routing, service, and pipeline modules
+- Decision: stage adapters declare required input keys via protocol; transforms
+  are composable and applied per-example before scoring
+- Out of scope: existing harness scoring path unchanged
 ```
 
 ## Context Reconstruction
@@ -77,9 +83,9 @@ The git log is an abstraction layer, not a replacement for code:
 
 1. Review working tree: `git status` or `git diff`
 2. Stage intentionally: `git add <files>` (avoid `git add .`)
-3. Assess scope: is this a small focused change, or a high-scope commit?
-4. Craft subject using `<what changed>: <why it matters>`
-5. For high-scope commits: add a body capturing boundaries and constraints
+3. Assess scope: can this be split into smaller coherent commits? If yes, split first.
+4. Craft subject using `<what changed>: <why it matters>` — check the why-clause is specific, not generic
+5. If high conceptual scope: add a body (Introduces / Decision / Out of scope)
 6. Commit: `git commit -m "<message>"` (or use HEREDOC for multi-line)
 7. Verify: `git log -1` (use `--oneline` for subject-only, full for body commits)
 
