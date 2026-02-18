@@ -1,6 +1,6 @@
 ## Verify loop
 
-After code changes: run the smallest relevant check (format/lint/unit tests). Prefer file-scoped commands when available; avoid repo-wide builds unless asked
+After code changes: run the smallest relevant check (format/lint/unit tests). Prefer file-scoped commands when available; avoid repo-wide builds unless instructed (e.g. by user, skills, or system instructions).
 
 
 ## Implementation Gating
