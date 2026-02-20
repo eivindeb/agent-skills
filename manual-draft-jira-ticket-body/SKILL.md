@@ -24,15 +24,25 @@ If this condition is not met, stop and do not run this skill workflow.
 2. Classify ticket type:
 - `implementation`: asks to build/change/fix behavior.
 - `investigation`: asks to analyze, document findings, or validate hypotheses.
-3. Identify missing inputs and add only lightweight, clearly-labeled assumptions.
-4. Draft a complete body using the template for the classified ticket type.
-5. Suggest a concise Jira title that matches the body.
-6. Ask up to 3 targeted follow-up questions only when missing details materially affect scope or acceptance criteria.
+3. Identify gaps: determine whether any missing details materially affect scope, acceptance criteria, or the correctness of the ticket body. Summarize your understanding of the request in 2-4 sentences so the user can confirm or correct it.
+4. **Clarification gate (ask-before-draft):**
+- If there are material gaps, ask up to 3 targeted follow-up questions. Do NOT draft the ticket body or title in the same response as the questions. Stop and wait for the user's answers.
+- If there are no material gaps, proceed directly to step 5.
+5. Draft a complete body using the template for the classified ticket type.
+6. Suggest a concise Jira title that matches the body.
 7. Revise quickly based on user edits and produce an updated full title + body.
+
+## Ask-Before-Draft Rule
+
+NEVER produce the full ticket body and follow-up questions in the same response. When questions are needed, the response must contain only:
+- A brief summary of your current understanding (2-4 sentences).
+- The follow-up questions (up to 3).
+
+Draft the ticket only after the user has answered or told you to proceed.
 
 ## Required Output
 
-Always output:
+When drafting (step 5-6), always output:
 
 1. `Suggested Title`
 2. `Ticket Body`
