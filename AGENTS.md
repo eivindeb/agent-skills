@@ -64,6 +64,10 @@ When working on a feature branch (any branch where `main..HEAD` has commits), th
   Your requested change trades that for: `<tradeoff>`.
   Which direction do you want: keep `<current>` or proceed with `<requested>`?"
 
+## Backward Compatibility
+
+Prefer clean, current-state code and do not add backward-compatibility paths unless explicitly requested; when a change is breaking, warn briefly about impact and confirm before implementing without compat support.
+
 ## Shell Script Line Endings
 
 **CRITICAL**: When writing shell scripts (`.sh` files), ALWAYS use Unix line endings (LF), never Windows line endings (CRLF).
