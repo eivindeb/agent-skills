@@ -28,10 +28,8 @@ When working on a feature branch (any branch where `main..HEAD` has commits), th
 
 2. Commit behavior:
    - Follow the `fcommit` philosophy throughout feature development.
-   - Commits must be atomic, intent-focused, and searchable.
-   - Use `<what changed>: <why it matters>`.
-   - Do not use `git add .`.
-   - Do not amend commits.
+   - If `fcommit` is required by these directives, treat it as explicitly invoked for the turn and load it before the first code edit.
+   - Before implementation, open and follow the `fcommit` skill, then commit after each logical chunk (do not batch commits at the end).
 
 ## Guardrail: Do Not Silently Implement Inferior Alternatives
 
