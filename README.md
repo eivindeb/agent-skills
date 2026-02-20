@@ -14,6 +14,5 @@ To see what `vipps` adds on top of `main`: `git log --oneline main..vipps`
 
 Skills and overrides that exist only on the `vipps` branch:
 * `manual-draft-jira-ticket-body` — Jira ticket body drafting
-* `PR-branch` — PR skill for single-remote workflow (sibling clone or in-place)
-* `PR-fork` — renamed from `PR` to coexist with `PR-branch`
+* `PR` — PR skill for single-remote workflow (sibling clone or in-place)
 * `feature-start` — extended with sibling clone workflow, PLAN.md handoff, venv symlink

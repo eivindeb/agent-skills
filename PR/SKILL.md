@@ -1,5 +1,5 @@
 ---
-name: pr-branch
+name: pr
 description: "Use when asked to prepare pull request creation for a feature branch in a single-remote workflow (sibling clone or in-place). Validates guardrails and outputs a ready-to-run gh pr create command for the user."
 ---
 
@@ -199,4 +199,4 @@ The remote branch is typically deleted by GitHub on merge; skip remote deletion 
 
 - `feature-start`: branch setup policy (sibling clone creation).
 - `fcommit`: progress commits during implementation.
-- `PR-branch`: this skill — final handoff command for user-run PR creation.
+- `PR`: this skill — final handoff command for user-run PR creation.
