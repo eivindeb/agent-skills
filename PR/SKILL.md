@@ -16,6 +16,18 @@ This skill does not stage, commit, push, or run `gh` directly. It validates bran
 - `origin` is the fork remote.
 - `upstream` is the canonical/original remote.
 
+## Establish Branch Context
+
+Before proceeding with PR preparation, use the branch-context skill to understand:
+- What has been implemented so far across all commits
+- Branch intent and motivation
+- Current state of the work
+
+This context is essential for:
+- Test failure analysis and fixes
+- Comprehensive PR body generation
+- Understanding the full scope of changes
+
 ## Guardrails
 
 Before producing the PR command, verify:
@@ -52,9 +64,27 @@ If upstream sync or conflict resolution is incomplete:
 - Do not output a `gh pr create` command.
 - Report what is blocking prerequisite completion.
 
+## Documentation Review
+
+After establishing branch context and completing prerequisites, review whether the branch changes warrant updates to project documentation before proceeding to preflight checks.
+
+Common triggers:
+
+- New modules, files, or directories added — the project overview or file tree in `AGENTS.md` may need updating.
+- Material changes to tests — test commands or instructions in project documentation may be outdated.
+- New or renamed public APIs, CLI commands, or configuration options — usage documentation may need corresponding updates.
+- Changes to build, deploy, or development workflows — relevant guides or READMEs may need revision.
+
+If any documentation appears stale relative to the branch changes:
+
+- Present the specific updates needed to the user with clear rationale.
+- Wait for the user to confirm the updates are complete (or explicitly decline them) before proceeding to preflight checks.
+
+Do not block on purely cosmetic or trivial gaps — focus on changes that would leave a reader of the documentation with an incorrect understanding of the project.
+
 ## Preflight Checks
 
-Run PR preflight checks only after prerequisites are complete.
+Run PR preflight checks only after prerequisites and documentation review are complete.
 
 Preflight checks are intended to be rerunnable.
 
@@ -84,20 +114,24 @@ Recommended cache implementation:
 - Record timestamp, commit SHA, command, and result.
 
 If tests fail:
-- Stop immediately.
-- Do not output a `gh pr create` command.
-- Report failing command and key failure summary.
+- Use branch-context skill (already run at start) to understand branch work and intent.
+- Analyze test failures in the context of branch changes.
+- Create an implementation plan to resolve test issues.
+- Execute fixes.
+- Re-run tests.
+- Only proceed when tests pass.
+- Do not output a `gh pr create` command until tests pass.
 
 ## PR Body Context Requirements
 
-When preparing the PR title/body, do not summarize only recent commits.
+When preparing the PR title/body, leverage the branch context established at the start.
 
-Requirements:
+Additional requirements:
 
-1. Read full commit history for the feature branch since divergence from main (for example `git log --oneline main..HEAD`).
+1. Ensure full commit history was reviewed during initial branch-context run.
 2. Reflect the entire branch scope in the PR body, including all meaningful changes.
 3. Include intent/motivation for the feature branch, not just implementation details.
-4. Look for a task document on the branch (for example `.agent/tasks/.../TASK.md`) and incorporate relevant background/context.
+4. Reference task document context if it was found (for example `.agent/tasks/.../TASK.md`).
 
 ## Output contract
 
