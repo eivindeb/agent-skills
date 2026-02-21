@@ -18,6 +18,15 @@ Use commits as context anchors during feature development:
 - Message format: `<what changed>: <why it matters>`
 - Focus on intent/outcome, not low-level implementation
 - Write messages you can later use to reconstruct progress quickly from `git log`
+- After each verified implementation chunk, commit immediately unless the user explicitly says not to
+- Do not stop at a post-change summary without committing when a chunk is complete
+
+## Execution Gates (Feature Branches)
+
+These are mandatory when `main..HEAD` has commits:
+- Hard gate: after each verified implementation chunk, create a commit unless the user explicitly opts out
+- Dirty-tree rule: if unrelated changes exist, stage only files touched for the current chunk and commit anyway
+- End-of-task evidence: for any code/doc edit task, include the resulting commit hash in the final user response
 
 ## Message Format
 
@@ -82,17 +91,20 @@ The git log is an abstraction layer, not a replacement for code:
 ## Workflow
 
 1. Review working tree: `git status` or `git diff`
-2. Stage intentionally: `git add <files>` (avoid `git add .`)
-3. Assess scope: can this be split into smaller coherent commits? If yes, split first.
-4. Craft subject using `<what changed>: <why it matters>` — check the why-clause is specific, not generic
-5. If high conceptual scope: add a body (Introduces / Decision / Out of scope)
-6. Commit: `git commit -m "<message>"` (or use HEREDOC for multi-line)
-7. Verify: `git log -1` (use `--oneline` for subject-only, full for body commits)
+2. Assess scope: can this be split into smaller coherent commits? If yes, split first.
+3. Run the smallest relevant verification for the chunk (lint/test/format as appropriate)
+4. Stage intentionally: `git add <files>` (avoid `git add .`; if tree is dirty, stage only touched files for this chunk)
+5. Craft subject using `<what changed>: <why it matters>` — check the why-clause is specific, not generic
+6. If high conceptual scope: add a body (Introduces / Decision / Out of scope)
+7. Commit immediately after verification: `git commit -m "<message>"` (or use HEREDOC for multi-line)
+8. Verify: `git log -1` (use `--oneline` for subject-only, full for body commits)
+9. In the user-facing task response, include the commit hash as evidence for the completed chunk/task
 
 ## Safety Checks
 
 - On feature branch (warn if on `main`)
 - No secrets in staged files
 - Commit is atomic (single logical change)
+- If unrelated working-tree changes exist, do not block progress; stage only current-chunk files
 - Never amend commits
 - Never use `git add .`
