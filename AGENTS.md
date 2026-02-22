@@ -2,7 +2,6 @@
 
 After code changes: run the smallest relevant check (format/lint/unit tests). Prefer file-scoped commands when available; avoid repo-wide builds unless instructed (e.g. by user, skills, or system instructions).
 
-
 ## Implementation Gating
 
 Default behavior: do not jump to implementation unless the user clearly uses action language (e.g. "implement", "change", "edit", "fix", "add", "remove", "run", "execute").
@@ -45,18 +44,18 @@ When working on a feature branch (any branch where `main..HEAD` has commits), th
      - "Do you want to keep the current approach, or proceed with your requested tradeoff?"
   5. Wait for user confirmation before implementing the inferior option.
 
-  ### Scope triggers (apply this rule when any are true)
+### Scope triggers (apply this rule when any are true)
   - Replacing a portable/default path with a user-specific path.
   - Hardcoding env-specific values where parameterization exists.
   - Swapping robust tooling for brittle/manual workflow.
   - Reducing safety checks, validation, retries, or error handling.
 
-  ### Not covered (do not block progress)
+### Not covered (do not block progress)
   - Bug fixes that improve compatibility/reliability.
   - Pure style/preferences with no clear technical regression.
   - User explicitly says they accept tradeoffs (still restate once, then proceed).
 
-  ### Response template
+### Response template
   "An existing supported approach already does this: `<approach>`.
   It may be better here because: `<reason 1>`, `<reason 2>`.
   Your requested change trades that for: `<tradeoff>`.
