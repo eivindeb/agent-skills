@@ -1,20 +1,58 @@
 ---
 name: "pr"
-description: "Use when asked to prepare and create a pull request for a feature branch by validating guardrails, syncing with upstream main, running preflight checks, and executing push/gh PR commands when possible."
+description: "Use when asked to prepare and create a pull request for a feature branch by validating guardrails, syncing with the correct main remote, running preflight checks, and executing push/gh PR commands when possible."
 ---
 
 ## Purpose
 
 PR-only endpoint for feature branches.
 
-This skill does not stage or commit. It validates branch/remotes state, prepares the feature branch against upstream main, runs full-project tests as part of preflight, and should execute push/PR commands directly when possible. If command execution fails, it outputs exact fallback commands for the user.
+This skill does not stage or commit. It validates branch/remotes state, prepares the feature branch against the correct `main` source remote, runs full-project tests as part of preflight, and should execute push/PR commands directly when possible. If command execution fails, it outputs exact fallback commands for the user.
 
 ## Inputs expected
 
 - Work is already committed on a feature branch.
-- Branch is pushed (or nearly pushed) to the agent-writable fork.
-- `origin` is the fork remote.
-- `upstream` is the canonical/original remote.
+- `origin` exists and points to the working repository.
+- `upstream` may or may not exist.
+- Workflow may be either:
+  - fork model: `origin` is fork and `upstream` is canonical, or
+  - single-remote model: `origin` is canonical and PR is opened from branch on the same repo.
+
+## Repository And Auth Model Detection
+
+Default modes:
+
+- `pr_model=auto`
+- `auth_scope=command` (default)
+- `auth_scope=subshell-session` (optional)
+
+Model resolution in `pr_model=auto`:
+
+1. Read URLs for `origin` and optional `upstream`.
+2. Parse `<owner>/<repo>` for each remote URL.
+3. If both remotes exist, repo names match, and owners differ: use `fork-two-remote`.
+4. If only `origin` exists, or both remotes resolve to same owner/repo: use `single-remote`.
+5. If remotes point to different repository names: fail and ask user to resolve target repository.
+
+Derived values after model resolution:
+
+- `target_remote`: `upstream` for `fork-two-remote`, otherwise `origin`.
+- `target_repo`: `<target_owner>/<repo_name>` from `target_remote`.
+- `head_ref`: `<origin_owner>:<branch>` for `fork-two-remote`, `<branch>` for `single-remote`.
+- `sync_main_ref`: `<target_remote>/main`.
+
+Bot-auth discovery in `auto` (no hardcoded user or bot names):
+
+1. Check whether remote URLs already use an SSH host alias with a dedicated identity in `~/.ssh/config`.
+2. If needed, discover local SSH candidates by scanning host aliases and identity file paths for `bot` (case-insensitive), then verify with non-interactive SSH probe before use.
+3. Use the first verified candidate only for auth-sensitive git network commands.
+4. If no verified candidate exists, continue with default git auth and report that no bot-specific SSH override was applied.
+
+Auth scope behavior:
+
+- `command`: prefix each auth-sensitive git command with a scoped override, e.g. `GIT_SSH_COMMAND='ssh -i <key> -o IdentitiesOnly=yes -o BatchMode=yes' git fetch ...`.
+- `subshell-session`: run a short grouped block with exported `GIT_SSH_COMMAND` for contiguous network commands only. Do not assume cross-chat or global persistence.
+- `gh` auth is separate from `git` SSH auth. Treat `gh` credentials explicitly and report failures separately.
 
 ## Establish Branch Context
 
@@ -43,11 +81,12 @@ Before producing the PR command, verify:
 
 1. Current branch is not `main`.
 2. Branch name follows feature flow (prefer `feature/*`, allow `fix/*`, `refactor/*`, `enhance/*`, `experiment/*`).
-3. `origin` and `upstream` both exist.
-4. `origin` and `upstream` point to different owners but the same repository name.
-5. Current branch tracks `origin/<branch>`.
-6. Working tree is clean.
-7. Branch contains commits not on `main`.
+3. `origin` exists.
+4. Repository model resolves successfully (`fork-two-remote` or `single-remote`).
+5. If `upstream` exists, repository names between `origin` and `upstream` match.
+6. Branch tracks `origin/<branch>`, or can be established via `git push -u origin <branch>` before PR creation.
+7. Working tree is clean.
+8. Branch contains commits not on `main`.
 
 If any check fails:
 - Stop immediately.
@@ -59,8 +98,8 @@ If any check fails:
 
 Complete these prerequisite steps before running preflight checks:
 
-1. Fetch latest upstream main.
-2. Merge upstream main into the current feature branch.
+1. Fetch latest `main` from the resolved sync remote (`sync_main_ref`).
+2. Merge the resolved sync branch into the current feature branch.
 3. If merge conflicts occur:
 - Stop before resolving.
 - Inspect each conflicted file and summarize what each side changed.
@@ -68,7 +107,12 @@ Complete these prerequisite steps before running preflight checks:
 - Get explicit user agreement for each suggested resolution.
 - Apply the agreed resolutions, then continue.
 
-If upstream sync or conflict resolution is incomplete:
+Use model-aware sync targets:
+
+- `fork-two-remote`: fetch/merge from `upstream/main`.
+- `single-remote`: fetch/merge from `origin/main`.
+
+If sync or conflict resolution is incomplete:
 - Stop immediately.
 - Do not output a `gh pr create` command.
 - Report what is blocking prerequisite completion.
@@ -187,7 +231,7 @@ Hard rule:
 When all preflight checks pass, output:
 
 1. A short preflight status summary.
-2. Attempt to push the branch (`git push -u origin <branch>` when needed).
+2. Attempt to push the branch (`git push -u origin <branch>` when needed), using configured auth scope for auth-sensitive git network commands.
 3. Attempt to run `gh pr create` directly using a PR body file (`--body-file`).
 4. Report command results and output the PR link as a standalone line in this exact format: `PR URL: <https://...>`.
 5. If push or `gh` command fails, provide a ready-to-run fallback command for the user.
@@ -207,29 +251,57 @@ Body transport strategy:
 
 Execution order:
 
-1. Ensure branch is pushed/up to date on `origin`.
-2. Create a temporary PR body file with the generated body content.
-3. Run `gh pr create` directly with `--body-file`.
-4. Fetch the created PR URL and print `PR URL: <https://...>`.
-5. Clean up the temporary file.
-6. Only fall back to user-run commands when direct execution fails.
+1. Resolve `pr_model` (`auto` by default) and derive `target_remote`, `target_repo`, and `head_ref`.
+2. Resolve auth strategy (`auth_scope=command` by default).
+3. Ensure branch is pushed/up to date on `origin`.
+4. Create a temporary PR body file with the generated body content.
+5. Run `gh pr create` directly with `--body-file`.
+6. Fetch the created PR URL and print `PR URL: <https://...>`.
+7. Clean up the temporary file.
+8. Only fall back to user-run commands when direct execution fails.
+
+Command-scoped auth template (default):
+
+```bash
+GIT_SSH_COMMAND='ssh -i <bot_key> -o IdentitiesOnly=yes -o BatchMode=yes' git fetch "${TARGET_REMOTE}" main
+GIT_SSH_COMMAND='ssh -i <bot_key> -o IdentitiesOnly=yes -o BatchMode=yes' git merge "${TARGET_REMOTE}/main"
+GIT_SSH_COMMAND='ssh -i <bot_key> -o IdentitiesOnly=yes -o BatchMode=yes' git push -u origin "$(git branch --show-current)"
+```
+
+Subshell-session auth template (optional):
+
+```bash
+(
+  export GIT_SSH_COMMAND='ssh -i <bot_key> -o IdentitiesOnly=yes -o BatchMode=yes'
+  git fetch "${TARGET_REMOTE}" main
+  git merge "${TARGET_REMOTE}/main"
+  git push -u origin "$(git branch --show-current)"
+)
+```
 
 Agent-run PR creation (preferred):
 
 ```bash
 BODY_FILE="$(mktemp)"
+BRANCH="$(git branch --show-current)"
+TARGET_REPO="<target_owner>/<repo_name>"
+# fork-two-remote:
+HEAD_REF="<origin_owner>:${BRANCH}"
+# single-remote:
+# HEAD_REF="${BRANCH}"
+
 cat > "${BODY_FILE}" <<'EOF'
 <summary of full branch context, motivation, and validation>
 EOF
 
 gh pr create \
-  --repo "<upstream_owner>/<repo_name>" \
+  --repo "${TARGET_REPO}" \
   --base main \
-  --head "<origin_owner>:$(git branch --show-current)" \
+  --head "${HEAD_REF}" \
   --title "<type>: <short summary>" \
   --body-file "${BODY_FILE}"
 
-PR_URL="$(gh pr view --repo "<upstream_owner>/<repo_name>" --json url --jq '.url')"
+PR_URL="$(gh pr view --repo "${TARGET_REPO}" --json url --jq '.url')"
 echo "PR URL: <${PR_URL}>"
 rm -f "${BODY_FILE}"
 ```
@@ -238,9 +310,9 @@ User-run fallback PR creation command (only when agent-run fails):
 
 ```bash
 gh pr create \
-  --repo "<upstream_owner>/<repo_name>" \
+  --repo "<target_owner>/<repo_name>" \
   --base main \
-  --head "<origin_owner>:$(git branch --show-current)" \
+  --head "<resolved head_ref>" \
   --title "<type>: <short summary>" \
   --body "<summary of full branch context, motivation, and validation>"
 ```
@@ -249,6 +321,12 @@ Push command (when upstream tracking is missing or branch not yet pushed):
 
 ```bash
 git push -u origin "$(git branch --show-current)"
+```
+
+In command-scoped mode with bot SSH override:
+
+```bash
+GIT_SSH_COMMAND='ssh -i <bot_key> -o IdentitiesOnly=yes -o BatchMode=yes' git push -u origin "$(git branch --show-current)"
 ```
 
 ### Shell-safety directive for fallback inline `--body`
@@ -267,8 +345,8 @@ After the user explicitly states the PR has been merged, include and run these s
 
 ```bash
 git checkout main
-git fetch upstream
-git rebase upstream/main
+git fetch <target_remote>
+git rebase <target_remote>/main
 git push origin main
 ```
 
