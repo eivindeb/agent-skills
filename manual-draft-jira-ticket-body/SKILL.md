@@ -40,6 +40,10 @@ NEVER produce the full ticket body and follow-up questions in the same response.
 
 Draft the ticket only after the user has answered or told you to proceed.
 
+## Assumptions Are Pre-Draft Questions
+
+If during analysis you identify uncertainties significant enough to list as "Assumptions to Confirm," treat them as pre-draft questions instead. Research them first using available tools, then surface any remaining unknowns to the user as clarification questions before drafting. The "Assumptions to Confirm" section in the ticket is reserved for things that can only be verified during implementation (e.g., runtime behavior, external team coordination), not for unknowns the ticket author could have resolved beforehand.
+
 ## Required Output
 
 When drafting (step 5-6), always output:
@@ -83,7 +87,7 @@ h2. Assumptions to Confirm
 * assumption one
 ```
 
-Omit `Potential Solution` if the user did not provide one. Omit `Evidence / References` if no evidence is provided. Omit `Assumptions to Confirm` when not needed.
+Omit `Potential Solution` if the user did not provide one. Omit `Evidence / References` if no evidence is provided. Omit `Assumptions to Confirm` when not needed. This section is only for assumptions that cannot be resolved before ticket creation — see "Assumptions Are Pre-Draft Questions" above.
 
 ### Investigation Ticket Template
 
@@ -110,7 +114,7 @@ h2. Assumptions to Confirm
 * assumption one
 ```
 
-Omit `Evidence / References` if no evidence is provided. Omit `Assumptions to Confirm` when not needed.
+Omit `Evidence / References` if no evidence is provided. Omit `Assumptions to Confirm` when not needed. This section is only for assumptions that cannot be resolved before ticket creation — see "Assumptions Are Pre-Draft Questions" above.
 
 ## Acceptance Criteria Quality Gate
 
@@ -139,6 +143,10 @@ Quick reference (Markdown → Jira Wiki Markup):
 | Table header | `\| H1 \| H2 \|` | `\|\|H1\|\|H2\|\|` |
 | Table row | `\| c1 \| c2 \|` | `\|c1\|c2\|` |
 | Code block | ` ```lang ``` ` | `{code:lang}...{code}` |
+
+### Known Jira Rendering Issues
+
+- `{{monospace}}` inside table cells (`||header||` / `|cell|`) is unreliable — Jira may interpret the braces as macro delimiters, producing "Unknown macro" errors. Avoid `{{}}` inside table cells entirely; the table context provides sufficient visual distinction.
 
 ## Drafting Rules
 
