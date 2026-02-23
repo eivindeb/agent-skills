@@ -159,19 +159,42 @@ If revalidation fails:
 
 Run a full-project test suite as the final preflight step.
 
+### Sandbox-safe `uv` execution
+
+If the canonical test/lint command uses `uv run`, do not run bare `uv`.
+
+First resolve the project virtual environment directory name (for example `.venv-linux`) in this order:
+
+1. Project instructions/docs (for example `AGENTS.md`, task docs, README).
+2. Repository config/tooling files (for example `pyproject.toml`, `uv.toml`, `Makefile`, CI config) that set `UV_PROJECT_ENVIRONMENT` or document the venv path.
+3. If still unknown, ask the user before running `uv` commands.
+
+Then prefix each `uv` command with:
+
+`UV_PROJECT_ENVIRONMENT=<venv-dir> UV_CACHE_DIR=/tmp/uv-cache`
+
+This avoids permission prompts from `uv` cache writes to `~/.cache/uv` in sandboxed/worktree sessions.
+
+Examples:
+
+- `UV_PROJECT_ENVIRONMENT=<venv-dir> UV_CACHE_DIR=/tmp/uv-cache uv run pytest -q ...`
+- `UV_PROJECT_ENVIRONMENT=<venv-dir> UV_CACHE_DIR=/tmp/uv-cache uv run ruff check ...`
+- `UV_PROJECT_ENVIRONMENT=<venv-dir> UV_CACHE_DIR=/tmp/uv-cache uv run ruff format --check ...`
+
 Requirements:
 
 1. Always identify and run the canonical run all tests command for the current project before producing a PR command.
-2. Cache successful test runs so they are not rerun unnecessarily.
-3. Cache key must include at least:
+2. If that command is `uv`-based, run it with the resolved `UV_PROJECT_ENVIRONMENT` and `UV_CACHE_DIR=/tmp/uv-cache` prefix.
+3. Cache successful test runs so they are not rerun unnecessarily.
+4. Cache key must include at least:
   - `HEAD` commit SHA
   - Test command string
-1. Reuse cached success when key matches and no tracked files changed since the cached run.
-1. Invalidate cache when:
+5. Reuse cached success when key matches and no tracked files changed since the cached run.
+6. Invalidate cache when:
   - `HEAD` changes
   - test command changes
   - tracked working tree content changes
-1. Failed test runs must never be cached as pass.
+7. Failed test runs must never be cached as pass.
 
 Recommended cache implementation:
 
@@ -349,6 +372,43 @@ git fetch <target_remote>
 git rebase <target_remote>/main
 git push origin main
 ```
+
+### Post-merge workspace cleanup (worktree/clone-worktree sessions)
+
+If the PR session is running from a sibling worktree or a sibling clone workaround directory, cleanup is required after the sync commands above.
+
+Detection rules:
+
+1. **Real git worktree checkout**: `git rev-parse --git-dir` differs from `git rev-parse --git-common-dir`.
+2. **Clone workaround checkout**: checkout path follows sibling pattern `w-<repo-root>--<branch-slug>` but is not a real git worktree checkout.
+
+Safety rule:
+
+- Do not try to delete the current working directory while still inside it.
+- Capture the path first, `cd` out, then remove.
+
+Real worktree cleanup:
+
+```bash
+WORKTREE_DIR="$(git rev-parse --show-toplevel)"
+PRIMARY_REPO_DIR="$(cd "$(git rev-parse --git-common-dir)/.." && pwd)"
+cd "${PRIMARY_REPO_DIR}"
+git worktree remove "${WORKTREE_DIR}"
+git worktree prune
+```
+
+Clone-workaround cleanup:
+
+```bash
+CLONE_DIR="$(git rev-parse --show-toplevel)"
+cd "$(dirname "${CLONE_DIR}")"
+rm -rf "${CLONE_DIR}"
+```
+
+Notes:
+
+- For clone-workaround cleanup, request explicit user confirmation before `rm -rf`.
+- If cleanup fails, report the exact error and provide the corrected command for the user.
 
 ## PR text quality bar
 
