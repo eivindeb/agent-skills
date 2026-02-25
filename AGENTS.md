@@ -68,3 +68,7 @@ Prefer clean, current-state code and do not add backward-compatibility paths unl
 ## Shell Script Line Endings
 
 **CRITICAL**: When writing shell scripts (`.sh` files), ALWAYS use Unix line endings (LF), never Windows line endings (CRLF).
+
+## GitHub Bot Identity
+
+For git operations that require authentication, use the `github.com-bot` SSH host alias from `~/.ssh/config` (`IdentityFile ~/.ssh/id_ed25519_github_bot`).

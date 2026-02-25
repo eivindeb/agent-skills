@@ -41,13 +41,6 @@ Derived values after model resolution:
 - `head_ref`: `<origin_owner>:<branch>` for `fork-two-remote`, `<branch>` for `single-remote`.
 - `sync_main_ref`: `<target_remote>/main`.
 
-Bot-auth discovery in `auto` (no hardcoded user or bot names):
-
-1. Check whether remote URLs already use an SSH host alias with a dedicated identity in `~/.ssh/config`.
-2. If needed, discover local SSH candidates by scanning host aliases and identity file paths for `bot` (case-insensitive), then verify with non-interactive SSH probe before use.
-3. Use the first verified candidate only for auth-sensitive git network commands.
-4. If no verified candidate exists, continue with default git auth and report that no bot-specific SSH override was applied.
-
 Auth scope behavior:
 
 - `command`: prefix each auth-sensitive git command with a scoped override, e.g. `GIT_SSH_COMMAND='ssh -i <key> -o IdentitiesOnly=yes -o BatchMode=yes' git fetch ...`.
