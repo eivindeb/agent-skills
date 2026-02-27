@@ -45,6 +45,8 @@ Use one skill with two supported modes:
 
 After branch approval, suggest a **sibling worktree** so work can happen in parallel without disturbing the main checkout. Use `git worktree` directly.
 
+**Agent scope in worktree mode:** planning discussion with the user, investigation (reading code, exploring the codebase) to build a comprehensive handoff plan, worktree creation, and `PLAN.md` delivery. The agent must NOT implement any of the plan — all implementation happens in the new worktree in a separate agent session.
+
 Location: `w-<repo-root>--<branch-slug>/` (sibling to the repo directory).
 - Replace `/` in the branch name with `-` for the slug.
 - The `w-` prefix groups all sibling worktrees together in directory listings and makes them easy to skip with tab-completion in the terminal.
@@ -114,11 +116,18 @@ When a sibling worktree is created, a handoff plan must be produced so the next 
 
 ### Hard Stop After Handoff (Worktree Mode Only)
 
-After creating the sibling worktree and delivering `PLAN.md`, the current agent session must stop implementation work.
+After creating the sibling worktree and delivering `PLAN.md`, the current agent session must stop. The only actions the agent performs after the plan is finalized are:
 
+1. Create the worktree (branch is created atomically via `git worktree add -b`)
+2. Set up environment symlinks if applicable
+3. Write/copy `PLAN.md` into the worktree root
+4. Tell the user to open the worktree in a new agent window
+
+Investigation and code reading to build a comprehensive `PLAN.md` is expected and encouraged — that happens *before* worktree creation, during the planning phase. What is prohibited is implementing the plan:
+
+- Do not implement any of the plan steps in the current repo. This is the most common failure mode: the agent builds a good plan and then starts coding it in-place instead of handing off.
 - Do not start coding in the sibling worktree in the same session.
-- Do not edit files under the sibling worktree path from the original session.
-- End with a handoff message telling the user to open the worktree in a new agent window and instruct that agent to follow `PLAN.md`.
+- Do not edit source files under the sibling worktree path from the original session.
 
 ### Delivery Methods (in order of preference)
 
@@ -142,7 +151,7 @@ The plan content above can be delivered via any of these mechanisms:
 
 ## Kickoff Steps
 
-During the planning conversation (before worktree creation in worktree mode), provide **2-4 concrete kickoff steps** tailored to the task:
+During the planning conversation, provide **2-4 concrete kickoff steps** tailored to the task:
 
 - **Clarifications** — what's ambiguous or needs user input before starting
 - **Investigation** — existing code or docs to review first
@@ -150,6 +159,9 @@ During the planning conversation (before worktree creation in worktree mode), pr
 - **Dependency checks** — packages, configs, or access to sort out
 
 Keep steps specific to the task, not generic.
+
+**In branch mode:** the agent presents these steps and waits for user approval before executing.
+**In worktree mode:** the agent may investigate (read code, explore the codebase) to produce a thorough plan, but must NOT implement any steps. The kickoff steps feed into `PLAN.md` for the next agent session to execute.
 
 ## Explicit Trigger Override
 
@@ -183,14 +195,17 @@ Requirements:
    - If `worktree`: suggest sibling worktree location → user accepts or declines
    - Present 2-4 kickoff steps → user accepts, adjusts, or discusses
    - If `worktree` accepted:
-     - Perform any investigation needed to populate the handoff plan
+     - Perform investigation needed to populate a comprehensive handoff plan (read code, explore codebase)
      - Resolve project virtual environment directory from docs/config; if unresolved, ask user
-     - Create branch and sibling worktree, deliver `PLAN.md` via preferred delivery method
+     - Create worktree (branch is created atomically via `git worktree add -b`)
+     - Set up environment symlinks if applicable
+     - Deliver `PLAN.md` into worktree root via preferred delivery method
      - Tell user to open worktree directory in new Cursor window and reference `PLAN.md`
-     - Stop. Do not continue implementation in the current session
+     - Stop. Do not implement any of the plan — not in the current repo, not in the worktree
    - If `branch` mode (or worktree declined):
      - Create and switch branch in-place
-     - Load `fcommit` skill, begin work
+     - Load `fcommit` skill
+     - Wait for user approval of kickoff steps before beginning implementation
 4. **If NO**:
    - Say direct commit is sufficient
    - Proceed
@@ -216,10 +231,12 @@ Shall I create this branch, or would you prefer a different name?
 3. Implement auth module with login/logout endpoints
 4. Add route protection and tests
 
-[User approves branch, picks mode, agrees to steps]
+[User approves branch, picks worktree mode, agrees to steps]
 
-[If worktree mode: agent creates worktree + PLAN.md, then stops and hands off]
-[If branch mode: agent executes setup and continues with fcommit]
+[Agent investigates codebase to build comprehensive PLAN.md]
+[Agent creates worktree, writes PLAN.md into it, stops]
+[Agent does NOT implement any of the plan — that's for the next session]
+[User opens worktree in new Cursor window, tells that agent: "Follow PLAN.md"]
 ```
 
 ## Important Notes
