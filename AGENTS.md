@@ -60,15 +60,3 @@ When working on a feature branch (any branch where `main..HEAD` has commits), th
   It may be better here because: `<reason 1>`, `<reason 2>`.
   Your requested change trades that for: `<tradeoff>`.
   Which direction do you want: keep `<current>` or proceed with `<requested>`?"
-
-## Backward Compatibility
-
-Prefer clean, current-state code and do not add backward-compatibility paths unless explicitly requested; when a change is breaking, warn briefly about impact and confirm before implementing without compat support.
-
-## Shell Script Line Endings
-
-**CRITICAL**: When writing shell scripts (`.sh` files), ALWAYS use Unix line endings (LF), never Windows line endings (CRLF).
-
-## GitHub Bot Identity
-
-For git operations that require authentication, use the `github.com-bot` SSH host alias from `~/.ssh/config` (`IdentityFile ~/.ssh/id_ed25519_github_bot`).
