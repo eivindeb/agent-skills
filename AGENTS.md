@@ -2,6 +2,13 @@
 
 After code changes: run the smallest relevant check (format/lint/unit tests). Prefer file-scoped commands when available; avoid repo-wide builds unless instructed (e.g. by user, skills, or system instructions).
 
+## Network/DNS Fallback
+
+If a command fails due to DNS/network resolution errors in the sandbox (for example, `failed to lookup address information`, `Temporary failure in name resolution`, or inability to reach PyPI), retry the same command with escalated permissions outside the sandbox.
+
+This commonly applies to `uv` commands that need to resolve/install dependencies (for example after adding or updating deps). Once dependencies are installed successfully, rerun checks normally in-sandbox when possible.
+
+
 ## Implementation Gating
 
 Default behavior: do not jump to implementation unless the user clearly uses action language (e.g. "implement", "change", "edit", "fix", "add", "remove", "run", "execute").
