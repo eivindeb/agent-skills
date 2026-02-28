@@ -106,5 +106,4 @@ The git log is an abstraction layer, not a replacement for code:
 - No secrets in staged files
 - Commit is atomic (single logical change)
 - If unrelated working-tree changes exist, do not block progress; stage only current-chunk files
-- Never amend commits
 - Never use `git add .`
