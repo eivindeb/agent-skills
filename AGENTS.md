@@ -26,12 +26,12 @@ Only proceed directly to implementation without a confirmation step when the use
 
 ## Branch Context Directives
 
-At the start of every new session (all branches), invoke `branch-context` immediately.
+At the start of every new session (all branches), invoke the `branch-context` skill immediately.
 
 When working on a feature branch (any branch where `main..HEAD` has commits), the following are required:
 
 1. Conversation start and implementation gate:
-   - Run `branch-context` immediately at session start.
+   - Run the `branch-context` skill immediately at session start.
    - Before substantial implementation, provide a brief task-linked relevance summary (and whether code-read is required).
 
 2. Commit behavior:
