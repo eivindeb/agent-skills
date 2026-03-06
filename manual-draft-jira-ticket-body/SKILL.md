@@ -25,24 +25,35 @@ If this condition is not met, stop and do not run this skill workflow.
 - `implementation`: asks to build/change/fix behavior.
 - `investigation`: asks to analyze, document findings, or validate hypotheses.
 3. Identify gaps: determine whether any missing details materially affect scope, acceptance criteria, or the correctness of the ticket body. Summarize your understanding of the request in 2-4 sentences so the user can confirm or correct it.
-4. **Clarification gate (ask-before-draft):**
-- If there are material gaps, ask up to 3 targeted follow-up questions. Do NOT draft the ticket body or title in the same response as the questions. Stop and wait for the user's answers.
-- If there are no material gaps, proceed directly to step 5.
+4. **Assumption gate (mandatory, separate message):**
+- List every candidate assumption you identified during analysis. Present them to the user as questions.
+- If you have no candidate assumptions, explicitly state: "No assumptions to confirm."
+- Include any other clarification questions (material gaps) in this same message.
+- Do NOT draft the ticket body or title in this message. Stop and wait for the user to respond.
+- The user will either: answer the questions, confirm that certain assumptions belong in the ticket as-is, or clear you to proceed.
 5. Draft a complete body using the template for the classified ticket type.
 6. Suggest a concise Jira title that matches the body.
 7. Revise quickly based on user edits and produce an updated full title + body.
 
 ## Ask-Before-Draft Rule
 
-NEVER produce the full ticket body and follow-up questions in the same response. When questions are needed, the response must contain only:
+NEVER produce the full ticket body and follow-up questions in the same response. The assumption gate (step 4) must be a separate message containing only:
 - A brief summary of your current understanding (2-4 sentences).
-- The follow-up questions (up to 3).
+- Candidate assumptions and/or clarification questions presented to the user, OR an explicit "No assumptions to confirm."
 
-Draft the ticket only after the user has answered or told you to proceed.
+Draft the ticket only after the user has responded and cleared you to proceed.
 
-## Assumptions Are Pre-Draft Questions
+## All Assumptions Go to the User
 
-If during analysis you identify uncertainties significant enough to list as "Assumptions to Confirm," treat them as pre-draft questions instead. Research them first using available tools, then surface any remaining unknowns to the user as clarification questions before drafting. The "Assumptions to Confirm" section in the ticket is reserved for things that can only be verified during implementation (e.g., runtime behavior, external team coordination), not for unknowns the ticket author could have resolved beforehand.
+Every candidate assumption MUST be surfaced to the user before drafting. The agent does not decide which assumptions are "material" or "implementation details" — all of them go to the user. The user decides which ones they can resolve, which ones belong in the ticket as assumptions, or whether to proceed without any.
+
+Research uncertainties first using available tools. Any that remain unresolved after research must be presented to the user in the assumption gate. The "Assumptions to Confirm" section in the final ticket is reserved only for items the user has explicitly confirmed cannot be resolved before ticket creation.
+
+### Negative Example — Do Not Do This
+
+> Agent identifies that velocity data could come from Redis or the database. This clearly affects implementation scope and the user can answer it immediately. Instead of asking, the agent drafts the full ticket and lists "Velocity counter will be implemented as a Redis-based counter" under Assumptions to Confirm.
+
+This is wrong. The agent rationalized an answerable question as an "implementation detail" and used the Assumptions section as an escape hatch to avoid the clarification gate. The correct action is to present it to the user in the assumption gate before drafting.
 
 ## Required Output
 
@@ -87,7 +98,7 @@ h2. Assumptions to Confirm
 * assumption one
 ```
 
-Omit `Potential Solution` if the user did not provide one. Omit `Evidence / References` if no evidence is provided. Omit `Assumptions to Confirm` when not needed. This section is only for assumptions that cannot be resolved before ticket creation — see "Assumptions Are Pre-Draft Questions" above.
+Omit `Potential Solution` if the user did not provide one. Omit `Evidence / References` if no evidence is provided. Omit `Assumptions to Confirm` when not needed. This section is only for assumptions that cannot be resolved before ticket creation — see "All Assumptions Go to the User" above.
 
 ### Investigation Ticket Template
 
@@ -114,7 +125,7 @@ h2. Assumptions to Confirm
 * assumption one
 ```
 
-Omit `Evidence / References` if no evidence is provided. Omit `Assumptions to Confirm` when not needed. This section is only for assumptions that cannot be resolved before ticket creation — see "Assumptions Are Pre-Draft Questions" above.
+Omit `Evidence / References` if no evidence is provided. Omit `Assumptions to Confirm` when not needed. This section is only for assumptions that cannot be resolved before ticket creation — see "All Assumptions Go to the User" above.
 
 ## Acceptance Criteria Quality Gate
 
