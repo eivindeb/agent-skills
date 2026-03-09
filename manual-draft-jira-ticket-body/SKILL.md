@@ -78,24 +78,24 @@ Use exactly one template:
 ```
 Suggested Title: <concise title>
 
-h2. Background
+## Background
 ...
 
-h2. Current Situation / What Is Missing
+## Current Situation / What Is Missing
 ...
 
-h2. Potential Solution
+## Potential Solution
 ...
 
-h2. Evidence / References
-* [link text|url]
+## Evidence / References
+- [link text](url)
 
-h2. Acceptance Criteria
-* criterion one
-* criterion two
+## Acceptance Criteria
+- criterion one
+- criterion two
 
-h2. Assumptions to Confirm
-* assumption one
+## Assumptions to Confirm
+- assumption one
 ```
 
 Omit `Potential Solution` if the user did not provide one. Omit `Evidence / References` if no evidence is provided. Omit `Assumptions to Confirm` when not needed. This section is only for assumptions that cannot be resolved before ticket creation — see "All Assumptions Go to the User" above.
@@ -105,31 +105,31 @@ Omit `Potential Solution` if the user did not provide one. Omit `Evidence / Refe
 ```
 Suggested Title: <concise title>
 
-h2. Background
+## Background
 ...
 
-h2. Current Situation / What Is Missing
+## Current Situation / What Is Missing
 ...
 
-h2. Investigation Scope / Hypotheses
+## Investigation Scope / Hypotheses
 ...
 
-h2. Evidence / References
-* [link text|url]
+## Evidence / References
+- [link text](url)
 
-h2. Acceptance Criteria
-* criterion one
-* criterion two
+## Acceptance Criteria
+- criterion one
+- criterion two
 
-h2. Assumptions to Confirm
-* assumption one
+## Assumptions to Confirm
+- assumption one
 ```
 
 Omit `Evidence / References` if no evidence is provided. Omit `Assumptions to Confirm` when not needed. This section is only for assumptions that cannot be resolved before ticket creation — see "All Assumptions Go to the User" above.
 
 ## Acceptance Criteria Quality Gate
 
-- Provide 3-7 bullet items using `*` (Jira bullet syntax).
+- Provide 3-7 bullet items using `-` (Markdown unordered list).
 - Write each criterion as observable and verifiable.
 - Prefer outcome-focused language over implementation details.
 - Include non-blocking or safety guardrails when relevant (for example: "must not block request processing").
@@ -137,27 +137,7 @@ Omit `Evidence / References` if no evidence is provided. Omit `Assumptions to Co
 
 ## Output Format Rules
 
-All ticket body output MUST use Jira Wiki Markup, NOT Markdown. Jira does not render Markdown.
-
-Quick reference (Markdown → Jira Wiki Markup):
-
-| Element | Markdown | Jira Wiki Markup |
-|---|---|---|
-| Heading 2 | `## Title` | `h2. Title` |
-| Heading 3 | `### Title` | `h3. Title` |
-| Bold | `**text**` | `*text*` |
-| Italic | `*text*` | `_text_` |
-| Inline code | `` `code` `` | `{{code}}` |
-| Bullet list | `- item` | `* item` |
-| Numbered list | `1. item` | `# item` |
-| Link | `[text](url)` | `[text\|url]` |
-| Table header | `\| H1 \| H2 \|` | `\|\|H1\|\|H2\|\|` |
-| Table row | `\| c1 \| c2 \|` | `\|c1\|c2\|` |
-| Code block | ` ```lang ``` ` | `{code:lang}...{code}` |
-
-### Known Jira Rendering Issues
-
-- `{{monospace}}` inside table cells (`||header||` / `|cell|`) is unreliable — Jira may interpret the braces as macro delimiters, producing "Unknown macro" errors. Avoid `{{}}` inside table cells entirely; the table context provides sufficient visual distinction.
+All ticket body output MUST use standard Markdown. Jira now renders Markdown natively.
 
 ## Drafting Rules
 
@@ -166,7 +146,7 @@ Quick reference (Markdown → Jira Wiki Markup):
 - Preserve and include user-provided links under `Evidence / References`.
 - Normalize obvious typos and grammar while preserving intent.
 - Keep scope bounded to what the user requested.
-- Never use Markdown syntax in the ticket body; always use Jira Wiki Markup.
+- Use standard Markdown syntax in the ticket body.
 
 ## Example Inputs To Recognize
 
