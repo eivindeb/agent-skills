@@ -4,11 +4,11 @@ Tracks commit-by-commit decisions when evaluating `main` commits for inclusion i
 
 ## Last reviewed range
 
-- Reviewed at: 2026-02-23
-- Main head reviewed: `f6dfeac`
-- Vipps head at review: `960b0aa`
+- Reviewed at: 2026-03-17
+- Main head reviewed: `72acfb4`
+- Vipps head at review: `ff76fc3`
 - Range: `vipps..main`
-- Execution status: in progress (direct adopts cherry-picked; partial ports applied manually; skip remains skipped)
+- Execution status: complete (cherry-picks applied; partial ports committed; skips recorded)
 
 ---
 
@@ -118,3 +118,108 @@ Tracks commit-by-commit decisions when evaluating `main` commits for inclusion i
 - Related commits:
   - dab91df
   - 947ce08
+
+---
+
+## 4f7816d - Clarify worktree/branch mode boundaries: prevent premature implementation
+- Date reviewed: 2026-03-17
+- Decision: superseded
+- Rationale:
+  - Worktree-specific changes (agent scope, hard stop) superseded by vipps clone-mode rewrite (e9f7b2d).
+  - Branch-mode approval gate ("wait for user approval of kickoff steps") already present in vipps feature-start via e9f7b2d.
+- Vipps constraints considered:
+  - local-clone-only (no worktree/fork workflow)
+  - remote-auth commands delegated to user
+- Next sync action:
+  - cherry-pick safe? no
+  - if partial: n/a — all valuable ideas already on vipps
+- Related commits:
+  - e9f7b2d (vipps clone-mode rewrite)
+
+## ae8cd9d - Add network DNS resolution error workaround escalation directive
+- Date reviewed: 2026-03-17
+- Decision: skip
+- Rationale:
+  - DNS/sandbox escalation workaround specific to outside-vipps setup (user-confirmed).
+  - Vipps environment does not encounter these sandbox restrictions.
+- Vipps constraints considered:
+  - local-clone-only (no worktree/fork workflow)
+  - remote-auth commands delegated to user
+- Next sync action:
+  - cherry-pick safe? n/a
+  - if partial: n/a
+- Related commits:
+  - none
+
+## 497c31a - Strengthen branch-context trigger and two-phase workflow
+- Date reviewed: 2026-03-17
+- Decision: adopt-partial
+- Rationale:
+  - Two-phase branch-context (session-start snapshot + pre-implementation gate) is a strong generic improvement.
+  - branch-context/SKILL.md had no vipps-specific changes, so main version applied directly.
+  - AGENTS.md section manually ported (rename to "Branch Context Directives", add session-start trigger) since vipps AGENTS.md has diverged.
+- Vipps constraints considered:
+  - local-clone-only (no worktree/fork workflow)
+  - remote-auth commands delegated to user
+- Next sync action:
+  - cherry-pick safe? no (AGENTS.md diverged)
+  - if partial: branch-context/SKILL.md replaced with main version; AGENTS.md section manually updated (applied via 42a0aac)
+- Related commits:
+  - 505a7e0 (minor wording fix absorbed into this port)
+
+## 47afd02 - Allow fcommit follow-up commits without amend requirement
+- Date reviewed: 2026-03-17
+- Decision: adopt-as-is
+- Rationale:
+  - Generic fcommit improvement removing "Never amend commits" line.
+  - No conflict with vipps constraints.
+- Vipps constraints considered:
+  - local-clone-only (no worktree/fork workflow)
+  - remote-auth commands delegated to user
+- Next sync action:
+  - cherry-pick safe? yes (applied on vipps via 26fc982)
+  - if partial: n/a
+- Related commits:
+  - none
+
+## 505a7e0 - Make branch-context mandatory on session start
+- Date reviewed: 2026-03-17
+- Decision: superseded
+- Rationale:
+  - Minor wording refinement ("the ... skill") on top of 497c31a.
+  - Absorbed into the 497c31a manual port.
+- Vipps constraints considered:
+  - local-clone-only (no worktree/fork workflow)
+  - remote-auth commands delegated to user
+- Next sync action:
+  - cherry-pick safe? n/a — absorbed into 497c31a port
+  - if partial: n/a
+- Related commits:
+  - 497c31a
+
+## 8481a32 - Merge branch 'main' of github.com:eivindeb/agent-skills
+- Date reviewed: 2026-03-17
+- Decision: skip
+- Rationale:
+  - Merge commit bringing remote main into local main. No unique content.
+- Vipps constraints considered:
+  - n/a
+- Next sync action:
+  - cherry-pick safe? n/a
+  - if partial: n/a
+- Related commits:
+  - ae8cd9d, 497c31a, 47afd02, 505a7e0
+
+## 72acfb4 - Add pr-address-comments skill for addressing PR review feedback
+- Date reviewed: 2026-03-17
+- Decision: adopt-as-is
+- Rationale:
+  - Brand new skill (pr-address-comments/SKILL.md). Fully generic, no conflict with vipps constraints.
+- Vipps constraints considered:
+  - local-clone-only (no worktree/fork workflow)
+  - remote-auth commands delegated to user
+- Next sync action:
+  - cherry-pick safe? yes (applied on vipps via 7b92ce1)
+  - if partial: n/a
+- Related commits:
+  - none
