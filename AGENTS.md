@@ -2,6 +2,13 @@
 
 After code changes: run the smallest relevant check (format/lint/unit tests). Prefer file-scoped commands when available; avoid repo-wide builds unless instructed (e.g. by user, skills, or system instructions).
 
+## Network/DNS Fallback
+
+If a command fails due to DNS/network resolution errors in the sandbox (for example, `failed to lookup address information`, `Temporary failure in name resolution`, or inability to reach PyPI), retry the same command with escalated permissions outside the sandbox.
+
+This commonly applies to `uv` commands that need to resolve/install dependencies (for example after adding or updating deps). Once dependencies are installed successfully, rerun checks normally in-sandbox when possible.
+
+
 ## Implementation Gating
 
 Default behavior: do not jump to implementation unless the user clearly uses action language (e.g. "implement", "change", "edit", "fix", "add", "remove", "run", "execute").
@@ -17,13 +24,15 @@ Example: if the user asks "can we input both strings and ints in this field?", d
 
 Only proceed directly to implementation without a confirmation step when the user explicitly instructs you to take action.
 
-## Feature Branch Directives
+## Branch Context Directives
+
+At the start of every new session (all branches), invoke the `branch-context` skill immediately.
 
 When working on a feature branch (any branch where `main..HEAD` has commits), the following are required:
 
-1. Conversation start context:
-   - Invoke the `branch-context` skill before substantial implementation.
-   - Provide a brief summary demonstrating understanding of what has already been done on the branch.
+1. Conversation start and implementation gate:
+   - Run the `branch-context` skill immediately at session start.
+   - Before substantial implementation, provide a brief task-linked relevance summary (and whether code-read is required).
 
 2. Commit behavior:
    - Follow the `fcommit` philosophy throughout feature development.
