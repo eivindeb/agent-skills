@@ -24,21 +24,6 @@ Example: if the user asks "can we input both strings and ints in this field?", d
 
 Only proceed directly to implementation without a confirmation step when the user explicitly instructs you to take action.
 
-## Branch Context Directives
-
-At the start of every new session (all branches), invoke the `branch-context` skill immediately.
-
-When working on a feature branch (any branch where `main..HEAD` has commits), the following are required:
-
-1. Conversation start and implementation gate:
-   - Run the `branch-context` skill immediately at session start.
-   - Before substantial implementation, provide a brief task-linked relevance summary (and whether code-read is required).
-
-2. Commit behavior:
-   - Follow the `fcommit` philosophy throughout feature development.
-   - If `fcommit` is required by these directives, treat it as explicitly invoked for the turn and load it before the first code edit.
-   - Before implementation, open and follow the `fcommit` skill, then commit after each logical chunk (do not batch commits at the end).
-
 ## Guardrail: Do Not Silently Implement Inferior Alternatives
 
   When the user requests a change that appears less general, less reliable, less secure, less performant, or higher-

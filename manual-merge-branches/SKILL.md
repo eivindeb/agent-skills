@@ -23,12 +23,12 @@ Accept exactly one of these starting conditions:
 
 If none applies, ask the user for missing branch input before running merge commands.
 
-## Required Pre-Step
+## Optional Pre-Step
 
-Load `branch-context` before:
+Use `branch-context` when recent branch history is needed to:
 
-- starting any merge flow, or
-- suggesting resolutions when the repo is already mid-merge.
+- understand the intent behind the branches being merged, or
+- make safer conflict-resolution suggestions in an existing merge state.
 
 ## Workflow
 

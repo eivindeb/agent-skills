@@ -1,30 +1,29 @@
 ---
 name: branch-context
-description: Rebuild branch context at session start and before implementation by reviewing recent commit history and summarizing what matters.
+description: Review recent branch history and summarize what matters when branch context is relevant to the current task.
 ---
 
 # Core Purpose
 
-Establish shared context twice:
-1) immediately at new-session start, and
-2) again right before substantial implementation.
+Establish shared branch context when recent commit history may affect the current task.
 
 This skill is for understanding branch progress, not for making commits.
 
 ## When to Use
 
-- At the start of every new conversation session (all branches)
-- Before substantial implementation work
+- When the user asks for branch context or references this skill
+- When another skill explicitly calls for branch history review
+- Before substantial implementation work if recent commits may affect the approach
 - When multiple humans/agents have contributed commits
 - After context switches where prior branch work may affect decisions
 
 ## Workflow
 
-### Phase A: Session-Start Snapshot (mandatory, immediate)
+### Phase A: Branch Snapshot
 
 1. Detect current branch:
    - `git branch --show-current`
-2. Read commit log immediately:
+2. Read the relevant commit log:
    - If on `main`: read last 12 commits
      - `git log --oneline -n 12`
    - If on feature branch: read all commits on branch delta
@@ -34,7 +33,7 @@ This skill is for understanding branch progress, not for making commits.
    - commit window reviewed
    - 2-4 bullets on recent themes/risk areas
 
-### Phase B: Pre-Implementation Relevance Gate (mandatory before coding)
+### Phase B: Task Relevance Gate
 
 1. State current task scope in one line (component/file area).
 2. Re-check commit relevance from Phase A history.
@@ -50,7 +49,7 @@ This skill is for understanding branch progress, not for making commits.
 
 ## Output Standard
 
-Output must include both phases when applicable in a session.
+Output should include the phases that are useful for the current task.
 
 Minimum Phase A output:
 - Branch line
@@ -68,7 +67,6 @@ Minimum Phase B output:
 
 ## Guardrails
 
-- Phase A must happen immediately in new sessions; do not delay it until implementation.
 - Keep review lightweight and task-focused.
 - Always read the full feature-branch commit subject list (`main..HEAD`).
 - Use `git show` selectively for relevant commits when required.
