@@ -4,11 +4,11 @@ Tracks commit-by-commit decisions when evaluating `main` commits for inclusion i
 
 ## Last reviewed range
 
-- Reviewed at: 2026-03-17
-- Main head reviewed: `72acfb4`
-- Vipps head at review: `ff76fc3`
+- Reviewed at: 2026-04-08
+- Main head reviewed: `404035d`
+- Vipps head at review: `31d9526`
 - Range: `vipps..main`
-- Execution status: complete (cherry-picks applied; partial ports committed; skips recorded)
+- Execution status: complete (partial port applied; superseded commit recorded)
 
 ---
 
@@ -223,3 +223,36 @@ Tracks commit-by-commit decisions when evaluating `main` commits for inclusion i
   - if partial: n/a
 - Related commits:
   - none
+
+---
+
+## 1c08d6d - Make branch-context an on-demand skill
+- Date reviewed: 2026-04-08
+- Decision: adopt-partial
+- Rationale:
+  - Removes mandatory session-start branch-context invocation, making it on-demand instead.
+  - Touches AGENTS.md, branch-context/SKILL.md, PR/SKILL.md, manual-merge-branches/SKILL.md.
+  - AGENTS.md diverged on vipps (different section structure), so manual port required.
+  - AGENTS.md section renamed from "Branch Context Directives" to "Feature Branch Directives"; session-start trigger removed, branch-context becomes pre-implementation only.
+  - branch-context/SKILL.md, PR/SKILL.md, manual-merge-branches/SKILL.md ported directly from main's version of the diff.
+- Vipps constraints considered:
+  - local-clone-only (no worktree/fork workflow)
+  - remote-auth commands delegated to user
+- Next sync action:
+  - cherry-pick safe? no (AGENTS.md diverged)
+  - if partial: all 4 files manually ported (applied in this sync)
+- Related commits:
+  - 497c31a, 505a7e0 (prior branch-context mandatory behavior now reversed)
+
+## 404035d - add grill me skill
+- Date reviewed: 2026-04-08
+- Decision: superseded
+- Rationale:
+  - Already on vipps as 31d9526 (identical content).
+- Vipps constraints considered:
+  - n/a
+- Next sync action:
+  - cherry-pick safe? n/a — already present
+  - if partial: n/a
+- Related commits:
+  - 31d9526 (vipps equivalent)

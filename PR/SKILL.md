@@ -195,7 +195,7 @@ Recommended cache implementation:
 - Record timestamp, commit SHA, command, and result.
 
 If tests fail:
-- Use branch-context skill (already run at start) to understand branch work and intent.
+- Use branch-context skill (run for this PR flow) to understand branch work and intent.
 - Analyze test failures in the context of branch changes.
 - Create an implementation plan to resolve test issues.
 - Execute fixes.
@@ -227,11 +227,11 @@ Run this gate immediately before any push or PR creation command.
 
 ## PR Body Context Requirements
 
-When preparing the PR title/body, leverage the branch context established at the start.
+When preparing the PR title/body, leverage the branch context established earlier in this PR workflow.
 
 Additional requirements:
 
-1. Ensure full commit history was reviewed during initial branch-context run.
+1. Ensure full commit history was reviewed during the branch-context review performed for this PR flow.
 2. Reflect the entire branch scope in the PR body, including all meaningful changes.
 3. Include intent/motivation for the feature branch, not just implementation details.
 4. Reference task document context if it was found (for example `.agent/tasks/.../TASK.md`).
