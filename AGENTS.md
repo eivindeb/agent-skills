@@ -23,17 +23,16 @@ Only proceed directly to implementation without a confirmation step when the use
 
 ## Guardrail: Do Not Silently Implement Inferior Alternatives
 
-  When the user requests a change that appears less general, less reliable, less secure, less performant, or higher-
-  maintenance than an already-supported option, do not implement immediately.
+When the user requests a change that appears less general, less reliable, less secure, less performant, or higher-maintenance than an already-supported option, do not implement immediately.
 
-  You MUST:
+You MUST:
 
-  1. Identify the existing supported option explicitly.
-  2. Explain why it is superior in this context (1-3 concrete reasons).
-  3. Explain the downside of the requested alternative.
-  4. Ask for a decision before changing code:
-     - "Do you want to keep the current approach, or proceed with your requested tradeoff?"
-  5. Wait for user confirmation before implementing the inferior option.
+1. Identify the existing supported option explicitly.
+2. Explain why it is superior in this context (1-3 concrete reasons).
+3. Explain the downside of the requested alternative.
+4. Ask for a decision before changing code:
+    - "Do you want to keep the current approach, or proceed with your requested tradeoff?"
+5. Wait for user confirmation before implementing the inferior option.
 
 ### Scope triggers (apply this rule when any are true)
   - Replacing a portable/default path with a user-specific path.
