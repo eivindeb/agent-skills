@@ -2,6 +2,10 @@
 
 After code changes: run the smallest relevant check (format/lint/unit tests). Prefer file-scoped commands when available; avoid repo-wide builds unless instructed (e.g. by user, skills, or system instructions).
 
+## Wiki location
+
+If the user invokes the llm-wiki skill in a credit-af-* repo, the Olga wiki is rooted at /Users/eeb/Documents/olga-wiki
+
 ## Implementation Gating
 
 Default behavior: do not jump to implementation unless the user clearly uses action language (e.g. "implement", "change", "edit", "fix", "add", "remove", "run", "execute").
