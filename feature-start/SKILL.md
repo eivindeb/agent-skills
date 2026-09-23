@@ -256,6 +256,6 @@ Shall I create this branch, or would you prefer a different name?
 - In clone mode, do not assume `.venv`; resolve the project environment directory from docs/config, or ask the user
 - In clone mode, for `uv run` commands use `UV_PROJECT_ENVIRONMENT=<venv-dir> UV_CACHE_DIR=/tmp/uv-cache`
 - In clone mode, `PLAN.md` is a handoff artifact — delete it before the final commit or PR
-- Use `/PR` only after the branch is pushed and the working tree is clean
+- Use `/PR` only after the branch is pushed (a clean working tree is not required)
 - Don't suggest feature branches for work already in progress
 - Clone mode uses lightweight local `git clone` (hardlinked objects), not `git worktree`
