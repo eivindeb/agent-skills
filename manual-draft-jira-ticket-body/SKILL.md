@@ -1,11 +1,11 @@
 ---
 name: manual-draft-jira-ticket-body
-description: Use only when explicitly invoked to create Jira ticket bodies.
+description: Use only when explicitly invoked to draft Jira ticket bodies and, after user approval, create Jira tickets through the Jira MCP.
 ---
 
 # Manual Draft Jira Ticket Body
 
-Produce a complete Jira ticket body even when the user provides incomplete notes. Keep the draft concise, concrete, and ready to paste into Jira.
+Produce a complete Jira ticket body even when the user provides incomplete notes. Keep the draft concise, concrete, and ready to paste into Jira. After the user approves the title/body, create the Jira ticket through the Jira MCP when available.
 
 ## Manual Invocation Gate
 
@@ -27,19 +27,23 @@ If this condition is not met, stop and do not run this skill workflow.
 3. Identify gaps: determine whether any missing details materially affect scope, acceptance criteria, or the correctness of the ticket body. Summarize your understanding of the request in 2-4 sentences so the user can confirm or correct it.
 4. **Assumption gate (mandatory, separate message):**
 - List every candidate assumption you identified during analysis. Present them to the user as questions.
+- When assumptions or clarification questions exist, format them as a numbered Markdown list (`1.`, `2.`, `3.`) so the user can address each item explicitly.
 - If you have no candidate assumptions, explicitly state: "No assumptions to confirm."
 - Include any other clarification questions (material gaps) in this same message.
+- Clarify Jira issue type whenever the user has not explicitly chosen `Task` or `Story`.
+- Clarify the parent issue whenever the user has not explicitly provided a parent key or clear parent name. If the user says there is no parent, proceed without one.
 - Do NOT draft the ticket body or title in this message. Stop and wait for the user to respond.
 - The user will either: answer the questions, confirm that certain assumptions belong in the ticket as-is, or clear you to proceed.
 5. Draft a complete body using the template for the classified ticket type.
 6. Suggest a concise Jira title that matches the body.
 7. Revise quickly based on user edits and produce an updated full title + body.
+8. After the user approves the final title/body for creation, create the Jira ticket through the Jira MCP.
 
 ## Ask-Before-Draft Rule
 
 NEVER produce the full ticket body and follow-up questions in the same response. The assumption gate (step 4) must be a separate message containing only:
 - A brief summary of your current understanding (2-4 sentences).
-- Candidate assumptions and/or clarification questions presented to the user, OR an explicit "No assumptions to confirm."
+- Candidate assumptions and/or clarification questions presented to the user as a numbered Markdown list, OR an explicit "No assumptions to confirm."
 
 Draft the ticket only after the user has responded and cleared you to proceed.
 
@@ -61,6 +65,24 @@ When drafting (step 5-6), always output:
 
 1. `Suggested Title`
 2. `Ticket Body`
+
+## Jira MCP Creation
+
+Default Jira project key: `RSM`.
+
+Before creating a ticket:
+
+1. Confirm the Jira issue type is either `Task` or `Story`.
+2. Confirm the parent issue key or parent name, or confirm that no parent should be used.
+3. Use the Jira MCP/Atlassian Rovo tools when available:
+   - discover the accessible Atlassian cloud/site when needed;
+   - inspect `RSM` project issue types if needed;
+   - resolve a parent name to a Jira issue key using JQL/search when the user gives a name instead of a key;
+   - create the issue with project key `RSM`, the confirmed issue type, summary, Markdown description, and parent when applicable.
+4. If multiple parent candidates match, stop and ask the user to choose one before creating the ticket.
+5. If the Jira MCP is unavailable or creation fails, return the approved title/body and a concise explanation of what blocked creation.
+
+Do not create the Jira ticket at the same time as the first draft. Wait for explicit user approval of the final title/body or an explicit instruction to create the ticket from the approved draft.
 
 ### Title Rules
 

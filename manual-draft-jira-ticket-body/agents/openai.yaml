@@ -1,4 +1,4 @@
 interface:
   display_name: "Manual Draft Jira Ticket Body"
-  short_description: "Manual only Jira ticket body drafting from partial notes."
-  default_prompt: "Draft a Jira ticket body from my notes."
+  short_description: "Draft Jira ticket bodies and create approved tickets via MCP."
+  default_prompt: "Draft a Jira ticket body from my notes, then create it after approval."
