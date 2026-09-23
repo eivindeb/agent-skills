@@ -12,7 +12,7 @@ Do not commit when the user explicitly asks for a draft-only change, requests no
 
 ## Wiki location
 
-If the user invokes the llm-wiki skill in a credit-af-* repo, the Olga wiki is rooted at /Users/eeb/Documents/olga-wiki
+If the user invokes the llm-wiki skill in a credit-af-* repo, the relevant wiki is rooted at /Users/eeb/Code/credit-af/olga-wiki
 
 ## Implementation Gating
 
@@ -58,3 +58,20 @@ You MUST:
   It may be better here because: `<reason 1>`, `<reason 2>`.
   Your requested change trades that for: `<tradeoff>`.
   Which direction do you want: keep `<current>` or proceed with `<requested>`?"
+
+## Python Virtual Environment
+
+When running locally (not in Databricks cluster via SSH tunnel (Remote Development)). Always invoke tools via the venv binary directly (e.g. `.venv/bin/python`, `.venv/bin/pip`) — do not use `source .venv/bin/activate` as it is not whitelisted in the sandbox.
+
+
+## Git Network Operations From Codex
+
+GitHub CLI auth may work even when `git push` over SSH fails. If `origin` uses
+`git@github.com:...` and Codex gets `Permission denied (publickey)`, do not
+change remotes. Push over HTTPS for that command only using the GitHub CLI
+credential helper:
+
+`git -c credential.helper='!gh auth git-credential' push -u https://github.com/vippsas/credit-af-ml.git <branch>`
+
+Use escalation for Git commands that write `.git` metadata. Create PRs with
+`gh pr create` after the branch is pushed.
