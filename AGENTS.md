@@ -2,6 +2,14 @@
 
 After code changes: run the smallest relevant check (format/lint/unit tests). Prefer file-scoped commands when available; avoid repo-wide builds unless instructed (e.g. by user, skills, or system instructions).
 
+## Commit Discipline
+
+Unless the user instructs otherwise, commit all implementation changes before handing off the task, regardless of size.
+
+Use concise, focused commit messages that describe the completed change. Commits provide an auditable, traceable history and useful context through `git log`; small or imperfect commits can be amended, reverted, or superseded later.
+
+Do not commit when the user explicitly asks for a draft-only change, requests no commit, or when verification identifies unresolved failures that make the implementation unsafe to hand off.
+
 ## Wiki location
 
 If the user invokes the llm-wiki skill in a credit-af-* repo, the Olga wiki is rooted at /Users/eeb/Documents/olga-wiki
